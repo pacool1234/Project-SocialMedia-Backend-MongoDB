@@ -1,9 +1,10 @@
-const express = require('express')
-const UserController = require('../controllers/UserController')
-const router = express.Router()
+const express = require('express');
+const UserController = require('../controllers/UserController');
+const router = express.Router();
 
-router.post('/create', UserController.create)
-router.get('/getall', UserController.getAll)
-router.delete('/deleteall', UserController.deleteAll)
+router.post('/create', UserController.create);
+router.get('/confirm/:emailToken', UserController.confirm);
+router.get('/getall', UserController.getAll);
+router.delete('/deleteall', UserController.deleteAll);
 
-module.exports = router
+module.exports = router;

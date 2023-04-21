@@ -1,13 +1,42 @@
-const User = require('../models/User');
+const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { jwt_secret } = require('../config/keys');
+const transporter = require('../config/nodemailer');
 
 const UserController = {
   async create(req, res) {
     try {
-      const user = await User.create(req.body);
-      res.status(201).send(user);
+      const password = await bcrypt.hash(req.body.password, 10);
+      const user = await User.create({ ...req.body, password: password });
+      const emailToken = jwt.sign({ email: req.body.email }, jwt_secret, { expiresIn: '48h' });
+      const url = `http://localhost:8080/users/confirm/${emailToken}`;
+      await transporter.sendMail({
+        to: req.body.email,
+        subject: 'Confirmation email',
+        html: `<h3>Welcome, you are one step away from registering</h3>
+        <a href='${url}'>Click to confirm your email</a>
+        <p>Confirme su correo en 48 horas</p>`
+      });
+      res.status(201).send({ message: 'User created', user });
     } catch (error) {
       console.error(error);
       res.status(500).send({ message: 'There was a problem when creating new user' });
+    }
+  },
+
+  async confirm(req, res) {
+    try {
+      const token = req.params.emailToken;
+      const payload = jwt.verify(token, jwt_secret);
+      await User.updateOne({
+        email: payload.email,
+        confirmed: true
+      });
+      res.status(201).send({ message: 'User confirmed' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
     }
   },
 
@@ -30,6 +59,6 @@ const UserController = {
       res.status(500).send(error);
     }
   }
-}
+};
 
 module.exports = UserController;
