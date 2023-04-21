@@ -4,8 +4,8 @@ const UserSchema = new mongoose.Schema({
   username: String,
   email: String,
   password: String,
-  role: String,
-  confirmed: Boolean
+  role: { type: String, default: 'user'},
+  confirmed: {type: Boolean, default: false}
   }, { timestamps: true }
 )
 
