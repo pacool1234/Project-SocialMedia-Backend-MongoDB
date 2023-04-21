@@ -29,11 +29,37 @@ const UserController = {
     try {
       const token = req.params.emailToken;
       const payload = jwt.verify(token, jwt_secret);
-      await User.updateOne({
-        email: payload.email,
-        confirmed: true
-      });
+      await User.updateOne(
+        { email: payload.email },
+        { confirmed: true }
+      );
       res.status(201).send({ message: 'User confirmed' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
+  },
+
+  async login(req, res) {
+    try {
+      const user = await User.findOne({ email: req.body.email });
+      if (!user) {
+        return res.status(400).send({ message: 'Incorrect user/password' });
+      }
+      if (!user.confirmed) {
+        return res.status(400).send({ message: 'Email must be confirmed first' });
+      }
+      const isMatch = await bcrypt.compare(req.body.password, user.password);
+      if (!isMatch) {
+        return res.status(400).send({ message: 'Incorrect user/password' });
+      }
+      const token = jwt.sign({ id: user.id }, jwt_secret);
+      await User.updateOne(
+        { email: req.body.email },
+        { $push: { tokens: token }},
+        { new: true }
+      );
+      res.send({ token, message: `Welcome ${user.username}`, user });
     } catch (error) {
       console.error(error);
       res.status(500).send(error);
