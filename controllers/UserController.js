@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { jwt_secret } = require('../config/keys');
 const transporter = require('../config/nodemailer');
+const mongoose = require('mongoose');
 
 const UserController = {
   async create(req, res) {
@@ -54,12 +55,26 @@ const UserController = {
         return res.status(400).send({ message: 'Incorrect user/password' });
       }
       const token = jwt.sign({ id: user.id }, jwt_secret);
-      await User.updateOne(
+      const updatedUser = await User.updateOne(
         { email: req.body.email },
-        { $push: { tokens: token }},
+        { $set: { token: token }},
+        { new: true }
+        );
+        res.send({ token, message: `Welcome ${user.username}`, updatedUser });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
+      }
+  },
+  
+  async logout(req, res) { // Does NOT work!!!!!!!!!!
+    try {
+      await User.updateOne(
+        { _id: req.user._id },
+        { $set: { tokens: '' }},
         { new: true }
       );
-      res.send({ token, message: `Welcome ${user.username}`, user });
+      res.send({ message: 'You have been logged out' })
     } catch (error) {
       console.error(error);
       res.status(500).send(error);
@@ -70,6 +85,19 @@ const UserController = {
     try {
       const users = await User.find();
       res.send(users);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
+  },
+
+  async getById(req, res) {
+    try {
+      // Cast first req.body._id to ObjectId
+      const userId = new mongoose.Types.ObjectId(req.body._id);
+      // This way we prevent CastError in the following line
+      const user = await User.findById({ _id: userId });
+      res.send(user);
     } catch (error) {
       console.error(error);
       res.status(500).send(error);

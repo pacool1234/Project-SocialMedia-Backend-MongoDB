@@ -7,9 +7,18 @@ const userId = {
 };
 
 const userSchema = new mongoose.Schema({
-  username: String,
-  email: String,
-  password: String,
+  username: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
   role: { 
     type: String, 
     default: 'user'
@@ -20,10 +29,10 @@ const userSchema = new mongoose.Schema({
   },
   following: [userId],
   followers: [userId],
-  tokens: [{ type: String }]
-  },
-  { timestamps: true }
-);
+  token: {
+    type: String
+  }
+}, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);
 
