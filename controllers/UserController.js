@@ -60,7 +60,7 @@ const UserController = {
         { $set: { token: token }},
         { new: true }
         );
-        res.send({ token, message: `Welcome ${user.username}`, updatedUser });
+        res.send({ token, message: `Welcome ${user.username}` });
       } catch (error) {
         console.error(error);
         res.status(500).send(error);
