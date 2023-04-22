@@ -19,6 +19,11 @@ const PostSchema = new mongoose.Schema( {
 
 }, { timestamps: true })
 
+PostSchema.index({   //enable text search
+    name: 'text'
+  });
+  
+
 const Post = mongoose.model('Post', PostSchema) 
 
 module.exports = Post;

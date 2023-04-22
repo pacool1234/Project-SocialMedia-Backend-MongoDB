@@ -8,7 +8,8 @@ router.post('/create', authentication, PostController.create);
 router.put('/update/:_id', authentication, isAuthor, PostController.update);
 router.delete('/delete/:_id', authentication, isAuthor, PostController.delete);
 router.get('/getAll', PostController.getAll)
-router.get('/getById/:_id', PostController.getbyId)
+router.get('/getById/:_id', PostController.getById)
+router.get('/getByTitle/:title', PostController.getByTitle)
 
 
 module.exports = router;

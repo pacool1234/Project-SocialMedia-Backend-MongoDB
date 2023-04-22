@@ -17,8 +17,7 @@ const PostController = {
     async update(req, res) {
         try {
             const post = await Post.findByIdAndUpdate(req.params._id, req.body);
-            console.log(req.user._id);
-            res.status(200).send({ msg: 'Post updated', post })
+            res.status(200).send({ msg: 'Post updated', post });
         } catch (error) {
             console.error(error);
             res.status(500).send(error);
@@ -27,8 +26,8 @@ const PostController = {
 
     async delete(req, res) {
         try {
-            const post = await Post.findByIdAndDelete(req.params._id)
-            res.status(200).send({msg:'Post deleted'}, post)
+            const post = await Post.findByIdAndDelete(req.params._id);
+            res.status(200).send({msg:'Post deleted', post} );
         } catch(error){
             console.error(error);
             res.status(500).send(error);
@@ -46,11 +45,24 @@ const PostController = {
         }
     },
 
-    async getbyId(req, res) {
+    async getById(req, res) {
         try {
             const post = await Post.findById(req.params._id).populate('userId', 'username'); 
             res.status(200).send(post);
         } catch(error){
+            console.error(error);
+            res.status(500).send(error);
+        }
+    },
+
+    async getByTitle(req, res) {
+        try{
+            const posts = await Post.find({$text: {$search: req.params.title}}).populate('userId', 'username');
+            if (posts.length === 0) {
+                return res.status(404).send('No such post');
+            }
+            res.status(200).send(posts);
+        }catch(error){
             console.error(error);
             res.status(500).send(error);
         }
@@ -59,14 +71,6 @@ const PostController = {
 
 
 }
-
-
-
-
-
-
-
-
 
 
 
