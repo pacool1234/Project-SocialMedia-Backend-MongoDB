@@ -1,17 +1,18 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const jwt_secret = require('../config/keys.js');
+const { jwt_secret } = require('../config/keys.js');
 
 
 
 
-const authentication = async(res, req, next) => {
+const authentication = async(req, res, next) => {
     try{
         const token = req.headers.authorization;
         const payload = jwt.verify(token, jwt_secret);
         const user = await User.findOne({_id: payload._id, tokens: token })
         
         if(!user) {
+            console.log(user);
             return res.status(401).send('Unauthorised request');
         }
 

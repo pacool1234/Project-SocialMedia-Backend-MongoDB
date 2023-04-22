@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const ObjectId = mongoose.SchemaTypes.ObjectId;
+
 
 const userId ={  //put the object in varaible to recycle it in both likes and userId
     type: ObjectId,
