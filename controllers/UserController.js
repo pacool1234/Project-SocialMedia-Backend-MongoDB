@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { jwt_secret } = require('../config/keys');
@@ -54,8 +54,8 @@ const UserController = {
       if (!isMatch) {
         return res.status(400).send({ message: 'Incorrect user/password' });
       }
-      const token = jwt.sign({ id: user.id }, jwt_secret);
-      const updatedUser = await User.updateOne(
+      const token = jwt.sign({ _id: user._id }, jwt_secret);
+      await User.updateOne(
         { email: req.body.email },
         { $set: { token: token }},
         { new: true }
