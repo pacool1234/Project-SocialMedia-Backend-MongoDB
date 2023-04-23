@@ -55,8 +55,10 @@ const UserController = {
         return res.status(400).send({ message: 'Incorrect user/password' });
       }
       const token = jwt.sign({ _id: user._id }, jwt_secret);
+
       await User.updateOne(
         { email: req.body.email },
+        { $push: { tokens: token }}, //KB: added these to make authentication work again
         { $set: { token: token }},
         { new: true }
         );
