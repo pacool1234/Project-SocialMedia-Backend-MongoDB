@@ -7,8 +7,14 @@ const userId ={  //put the object in varaible to recycle it in both likes and us
     ref: 'User'
 }
 const PostSchema = new mongoose.Schema( {
-    title: String,
-    body: String,
+    title: {
+        type: String,
+        required: [true, 'Post must have a title']
+    },
+    body: {
+        type: String,
+        required: [true, 'Post must have some text']
+    },
     image: String,
     likes: [userId],  //number of likes on frontend! Array of user objects
     userId,           //OP
