@@ -1,4 +1,5 @@
 const Post = require('../models/Post');
+const fs = require('fs') //node.js file system module
 
 
 const PostController = {
@@ -16,10 +17,18 @@ const PostController = {
             res.status(500).send(error);
         }
     },
-
+//PROBLEM : just changing image doesn't work! STILL WORKING ON THIS
     async update(req, res) {
         try {
-            const post = await Post.findByIdAndUpdate(req.params._id, req.body);
+            let data = req.body;  
+            if(req.file){            
+                data = {...req.body, image: req.file.path }
+                const post = await Post.findById(req.params._id)  //We delete the old image from uploads if the user provides a new one
+                if (post.image) {
+                    fs.unlinkSync(post.image);   //Node.js method that deletes the corresponding file
+                  }
+            }
+            const post = await Post.findByIdAndUpdate(req.params._id, data, {new:true});
             res.status(200).send({ msg: 'Post updated', post });
         } catch (error) {
             console.error(error);
@@ -30,7 +39,10 @@ const PostController = {
     async delete(req, res) {
         try {
             const post = await Post.findByIdAndDelete(req.params._id);
-            res.status(200).send({msg:'Post deleted', post} );
+            if (post.image) {
+                fs.unlinkSync(post.image);   //Node.js method that deletes the corresponding file
+              }
+            res.status(200).send({msg:'Post and uploaded files deleted', post} );
         } catch(error){
             console.error(error);
             res.status(500).send(error);
