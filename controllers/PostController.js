@@ -1,9 +1,6 @@
 const Post = require('../models/Post');
 
 
-
-
-
 const PostController = {
 
     async create(req, res) {  //add 'required' to model

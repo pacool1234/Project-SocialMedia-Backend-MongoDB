@@ -7,7 +7,7 @@ const upload = function (subfolder) {
     return multer({
         storage: multer.diskStorage({
             destination: (req, file, cb) => {
-                cb(null, "./public/uploads/" + subfolder)
+                cb(null, './public/uploads/' + subfolder)
             },
             filename: (req, file, cb) => {
                 cb(null, Date.now() + '-' + file.originalname)  //date is added to create a unique filename
