@@ -9,6 +9,6 @@ router.put('/login', UserController.login);
 router.put('/logout', authentication, UserController.logout);
 router.get('/getall', UserController.getAll);
 router.get('/getbyid', UserController.getById);
-router.delete('/deleteall', UserController.deleteAll);
+router.delete('/deleteall', UserController.deleteAll); // just for dev purposes, won't make it to production
 
 module.exports = router;

@@ -1,9 +1,9 @@
-const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const User = require('../models/User');
 const { jwt_secret } = require('../config/keys');
 const transporter = require('../config/nodemailer');
-const mongoose = require('mongoose');
 
 const UserController = {
   async create(req, res) {
