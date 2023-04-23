@@ -1,7 +1,7 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 const PORT = 8080;
-const { dbConnection } = require("./config/config")
+const { dbConnection } = require('./config/config')
 
 app.use(express.json())
 
