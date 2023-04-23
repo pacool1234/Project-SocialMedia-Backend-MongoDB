@@ -106,10 +106,11 @@ const UserController = {
     }
   },
   
-  async deleteAll(req, res) {
+  async deleteById(req, res) {
     try {
-      await User.deleteMany({});
-      res.send({ message: 'All users deleted' });
+      const userId = new mongoose.Types.ObjectId(req.params._id);
+      const user = await User.findByIdAndDelete({ _id: userId });
+      res.send({ message: `User ${user.username} deleted` });
     } catch (error) {
       console.error(error);
       res.status(500).send(error);
