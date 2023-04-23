@@ -17,7 +17,7 @@ const PostController = {
             res.status(500).send(error);
         }
     },
-//PROBLEM : just changing image doesn't work! STILL WORKING ON THIS
+
     async update(req, res) {
         try {
             let data = req.body;  
