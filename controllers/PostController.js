@@ -81,6 +81,20 @@ const PostController = {
             console.error(error);
             res.status(500).send(error);
         }
+    },
+//HERE!
+    async likePost(req,res){
+        try{
+            console.log(req.user.userId);
+            const post = await Post.findByIdAndUpdate(req.params._id)
+            post.likes.push(req.user.userId);
+            await post.save();            
+            res.status(201).send({msg: 'You\'ve liked this post!', post})
+        }catch(error){
+            console.error(error);
+            res.status(500).send(error)
+        }
+
     }
 
 

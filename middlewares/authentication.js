@@ -11,9 +11,8 @@ const authentication = async(req, res, next) => {
         const token = req.headers.authorization;
         const payload = jwt.verify(token, jwt_secret);
         const user = await User.findOne({_id: payload._id, token }) // tokens: token - changed after user model/login was changed to one token only
-        
         if(!user) {
-            console.log(user.toString());
+            console.log(user);
             return res.status(401).send('Unauthorised request');
         }
 
