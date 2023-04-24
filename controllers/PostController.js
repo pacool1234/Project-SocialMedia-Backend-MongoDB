@@ -52,7 +52,11 @@ const PostController = {
 
     async getAll(req, res) {
         try {
-            const posts = await Post.find().populate('userId', 'username'); //Add info from an another collection -  must include userId and whatever else I want to see
+            const posts = await Post.find().populate('userId', 'username'); 
+            /*Add info from an another collection -  must include userId (the "path") and another value. If we want to add more information from another table, we open an object like this: populate({
+                path: 'likes',
+                select: 'username name email role',  etc.
+              });*/
             res.status(200).send(posts);
         } catch(error){
             console.error(error);
@@ -82,20 +86,43 @@ const PostController = {
             res.status(500).send(error);
         }
     },
-//HERE!
+
     async likePost(req,res){
         try{
-            console.log(req.user.userId);
-            const post = await Post.findByIdAndUpdate(req.params._id)
-            post.likes.push(req.user.userId);
-            await post.save();            
+            console.log("THIS is current user" + req.user._id);
+         
+            const post = await Post.findByIdAndUpdate(req.params._id);
+            post.likes.push(req.user._id)
+            await post.save();   
+            
+            /*OPTION 2:
+            // const post = await Post.findByIdAndUpdate(req.params._id, {
+            //       $push: { likes: req.user._id},
+            //     },
+            //     { new: true }
+            //   );
+            */
+
             res.status(201).send({msg: 'You\'ve liked this post!', post})
         }catch(error){
             console.error(error);
             res.status(500).send(error)
         }
 
-    }
+    },
+
+    async getAllWithLikes(req, res) {
+        try {
+            const posts = await Post.find().populate({
+                path:'likes', 
+                select: 'username role'
+            });
+            res.status(200).send(posts);
+        } catch(error){
+            console.error(error);
+            res.status(500).send(error);
+        }
+    },
 
 
 
