@@ -49,6 +49,46 @@ const PostController = {
         }
 
     },
+    
+    async likePost(req, res) {
+        try {
+            const post = await Post.findByIdAndUpdate(req.params._id);
+            if (post.likes.includes(req.user._id)) {
+                return res.status(400).send('You\'ve already liked this post');
+            }
+            post.likes.push(req.user._id)
+            await post.save();
+
+            /*OPTION 2:
+            // const post = await Post.findByIdAndUpdate(req.params._id, {
+            //       $push: { likes: req.user._id},
+            //     },
+            //     { new: true }
+            //   );
+            */
+
+            res.status(201).send({ msg: 'You\'ve liked this post!', post })
+        } catch (error) {
+            console.error(error);
+            res.status(500).send(error)
+        }
+    },
+
+    async unlikePost(req, res) {
+        try {
+            const post = await Post.findByIdAndUpdate(req.params._id);
+            if (post.likes.includes(req.user._id)) {
+                post.likes.pull(req.user._id);
+                await post.save();
+                return res.status(200).send({ msg: 'You\'ve unliked the post.', post })
+            } else {
+                return res.status(400).send('Cannot unlike a post you haven\'t liked')
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).send(error)
+        }
+    },
 
     async getAll(req, res) {
         try {
@@ -87,45 +127,19 @@ const PostController = {
         }
     },
 
-    async likePost(req,res){
-        try{
-            console.log("THIS is current user" + req.user._id);
-         
-            const post = await Post.findByIdAndUpdate(req.params._id);
-            post.likes.push(req.user._id)
-            await post.save();   
-            
-            /*OPTION 2:
-            // const post = await Post.findByIdAndUpdate(req.params._id, {
-            //       $push: { likes: req.user._id},
-            //     },
-            //     { new: true }
-            //   );
-            */
-
-            res.status(201).send({msg: 'You\'ve liked this post!', post})
-        }catch(error){
-            console.error(error);
-            res.status(500).send(error)
-        }
-
-    },
 
     async getAllWithLikes(req, res) {
         try {
             const posts = await Post.find().populate({
-                path:'likes', 
+                path: 'likes',
                 select: 'username role'
             });
             res.status(200).send(posts);
-        } catch(error){
+        } catch (error) {
             console.error(error);
             res.status(500).send(error);
         }
     },
-
-
-
 }
 
 
