@@ -1,7 +1,11 @@
 const multer = require('multer');
 const mimetypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'];
 
-//The following code returns storage path, unique name for each file and defines limits. The exact file paths are defined by calling upload function (below) and adding the subfolder for user, post, comments
+/*
+The following code returns storage path, unique name for each file and 
+defines limits. The exact file paths are defined by calling upload 
+function (below) and adding the subfolder for user, post, comments
+*/
 
 const upload = function (subfolder) {
     return multer({
@@ -28,7 +32,7 @@ const upload = function (subfolder) {
 
         
 const uploadUserImg = upload('users'); //passing subfolder as parameter
-const uploadPostImg = upload('posts')
+const uploadPostImg = upload('posts');
 const uploadCommentImg = upload('comments');
 
-module.exports = { uploadUserImg, uploadPostImg, uploadCommentImg}
+module.exports = { uploadUserImg, uploadPostImg, uploadCommentImg }
