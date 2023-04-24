@@ -68,11 +68,14 @@ const UserController = {
       }
   },
   
-  async logout(req, res) { // Does NOT work!!!!!!!!!!
+  async logout(req, res) {
     try {
+      const tokens = req.user.token; // bring tokens array to JS
+      const indexOfToken = tokens.indexOf(req.headers.authorization); // find index of token device is using
+      tokens.splice(indexOfToken, 1); // delete it from array
       await User.updateOne(
         { _id: req.user._id },
-        { $set: { tokens: '' }},
+        { $set: { token: tokens }}, // substituting old array with new one without the token
         { new: true }
       );
       res.send({ message: 'You have been logged out' })
