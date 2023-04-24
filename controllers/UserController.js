@@ -10,6 +10,11 @@ const UserController = {
     try {
       const password = await bcrypt.hash(req.body.password, 10);
       const user = await User.create({ ...req.body, password: password });
+      // const user = await User.create({ // we use the above one
+      //   ...req.body,                   // for dev purposes
+      //   password: password,
+      //   confirmed: false
+      //  });
       const emailToken = jwt.sign({ email: req.body.email }, jwt_secret, { expiresIn: '48h' });
       const url = `http://localhost:8080/users/confirm/${emailToken}`;
       await transporter.sendMail({
@@ -79,6 +84,19 @@ const UserController = {
         { new: true }
       );
       res.send({ message: 'You have been logged out' })
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
+  },
+
+  async update(req, res) {
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.user._id,
+        req.body
+      );
+      res.send({ message: `User ${user.username} updated` });
     } catch (error) {
       console.error(error);
       res.status(500).send(error);
