@@ -11,6 +11,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  title: { // User can write e.g: artist, content-creator, etc
+    type: String
+  },
+  bio: { // self-explanatory
+    type: String
+  },
   email: {
     type: String,
     required: true
@@ -29,9 +35,9 @@ const userSchema = new mongoose.Schema({
   },
   following: [userId],
   followers: [userId],
-  token: {
+  token: [{  // go back to array of tokens !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     type: String
-  }
+  }]
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);

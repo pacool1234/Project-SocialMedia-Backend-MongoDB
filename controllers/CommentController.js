@@ -6,9 +6,10 @@ const CommentController = {
   async create(req, res) {
     try {
       const comment = await Comment.create(req.body);
-      await Post.updateOne({
-        
-      })
+      await Post.updateOne(
+        { userId: req.user._id }, // Wrong, this means that you will add the comment to the first occurrence of the post posted by the guy who comments
+        { $push: { commentIds: comment._id } }
+      )
       res.status(201).send({ message: 'Comment created', comment });
     } catch (error) {
       console.error(error);

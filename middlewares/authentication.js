@@ -10,7 +10,7 @@ const authentication = async(req, res, next) => {
     try{
         const token = req.headers.authorization;
         const payload = jwt.verify(token, jwt_secret);
-        const user = await User.findOne({_id: payload._id, token }) // tokens: token - changed after user model/login was changed to one token only
+        const user = await User.findOne({_id: payload._id, tokens: token }) // tokens: token - changed after user model/login was changed to one token only
         
         if(!user) {
             console.log(user.toString());

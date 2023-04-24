@@ -58,8 +58,7 @@ const UserController = {
 
       await User.updateOne(
         { email: req.body.email },
-        { $push: { tokens: token }}, //KB: added these to make authentication work again
-        { $set: { token: token }},
+        { $push: { token: token }}, //KB: added these to make authentication work again
         { new: true }
         );
         res.send({ token, message: `Welcome ${user.username}` });
