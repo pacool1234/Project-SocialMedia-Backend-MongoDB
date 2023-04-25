@@ -1,14 +1,20 @@
 const mongoose = require('mongoose');
+const fs = require('fs');
 const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 
 const CommentController = {
   async create(req, res) {
     try {
-      const comment = await Comment.create(req.body);
+      let data = {...req.body, userId: req.user._id};
+      if (req.file) {
+        data = { ...req.body, userId: req.user._id, image: req.file.path };
+      }
+      const comment = await Comment.create(data);
+
       await Post.updateOne(
-        { userId: req.user._id }, // Wrong, this means that you will add the comment to the first occurrence of the post posted by the guy who comments
-        { $push: { commentIds: comment._id } }
+        { _id: req.params.postid }, // params.postid identifies
+        { $push: { commentIds: comment._id } } // newly created comment._id
       )
       res.status(201).send({ message: 'Comment created', comment });
     } catch (error) {
@@ -27,8 +33,13 @@ const CommentController = {
     }
   },
 
-  async foo_2(req, res) {
-
+  async delete(req, res) {
+    try {
+      // not yet
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
   },
 
   async foo_3(req, res) {

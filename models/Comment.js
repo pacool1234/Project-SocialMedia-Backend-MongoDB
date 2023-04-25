@@ -9,6 +9,10 @@ const commentSchema = new mongoose.Schema({
   image: {
     type: String
   },
+  userId: {
+    type: ObjectId,
+    ref: 'User'
+  },
   likes: {
     type: ObjectId,
     ref: 'User'
