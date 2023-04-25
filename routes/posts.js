@@ -9,6 +9,7 @@ router.post('/create', authentication, uploadPostImg.single('image'), PostContro
 router.put('/update/:_id', authentication,uploadPostImg.single('image'), isAuthor, PostController.update);
 router.delete('/delete/:_id', authentication, isAuthor, PostController.delete);
 router.get('/getAll', PostController.getAll);
+router.get('/getAndLimit', PostController.getTenPerPage);
 router.get('/getById/:_id', PostController.getById);
 router.get('/getByTitle/:title', PostController.getByTitle);
 router.put('/likePost/:_id', authentication, PostController.likePost);

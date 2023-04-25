@@ -104,9 +104,35 @@ const PostController = {
         }
     },
 
+    async getTenPerPage(req, res) {
+        try {
+            const {page = 1, limit = 10} = req.query;
+            const posts = await Post.find()
+                .limit(limit)
+                .skip((page - 1) * limit)
+                .populate('userId', 'username');
+            res.status(200).send({msg: `You're on page ${page} of posts`, posts});
+        } catch(error){
+            console.error(error);
+            res.status(500).send(error);
+        }
+    },
+
     async getById(req, res) {
         try {
-            const post = await Post.findById(req.params._id).populate('userId', 'username'); 
+            const post = await Post.findById(req.params._id)
+            .populate('userId', 'username')
+            .populate({
+                path: 'likes',
+                select: 'username'
+            })
+            .populate({
+                path: 'commentIds',
+                populate: {
+                    path: 'userId',
+                    select: 'username'
+                }
+            }); 
             res.status(200).send(post);
         } catch(error){
             console.error(error);
@@ -116,7 +142,19 @@ const PostController = {
 
     async getByTitle(req, res) {
         try{
-            const posts = await Post.find({$text: {$search: req.params.title}}).populate('userId', 'username');
+            const posts = await Post.find({$text: {$search: req.params.title}})
+            .populate('userId', 'username')
+            .populate({
+                path: 'likes',
+                select: 'username'
+            })
+            .populate({
+                path: 'commentIds',
+                populate: {
+                    path: 'userId',
+                    select: 'username'
+                }
+            }); 
             if (posts.length === 0) {
                 return res.status(404).send('No such post');
             }

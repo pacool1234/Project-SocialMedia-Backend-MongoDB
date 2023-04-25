@@ -26,7 +26,7 @@ const PostSchema = new mongoose.Schema( {
 }, { timestamps: true })
 
 PostSchema.index({   //enable text search
-    name: 'text' // Paco: Kate, did you mean: title: 'text' ????????????????????
+    title: 'text' 
   });
   
 
