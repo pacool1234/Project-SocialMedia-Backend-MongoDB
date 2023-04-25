@@ -43,14 +43,16 @@ const CommentController = {
           fs.unlinkSync(comment.image)
         }
       }
-      const comment = await Comment.findByIdAndUpdate(req.params._id, data, {new: true})
-
-
+      const comment = await Comment.findByIdAndUpdate(
+        req.params._id,
+        data,
+        { new: true }
+      );
+      res.status(200).send({msg:'Comment updated', comment})
     }catch (error){
       console.error(error);
       res.status(500).send(error);
     }
-
   },
 
   async delete(req, res) {
