@@ -80,7 +80,7 @@ const UserController = {
   
   async logout(req, res) {
     try {
-      const tokens = req.user.token; // bring tokens array to JS
+      const tokens = req.user.tokens; // bring tokens array to JS
       const indexOfToken = tokens.indexOf(req.headers.authorization); // find index of token device is using
       tokens.splice(indexOfToken, 1); // delete it from array
       await User.updateOne(
