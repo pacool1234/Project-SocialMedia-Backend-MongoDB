@@ -127,12 +127,18 @@ const PostController = {
         }
     },
 
-
-    async getAllWithLikes(req, res) {
+    async getAllWithLikesAndComments(req, res) {
         try {
             const posts = await Post.find().populate({
                 path: 'likes',
-                select: 'username role'
+                select: 'username'
+            })
+            .populate({
+                path: 'commentIds',
+                populate: {
+                    path: 'userId',
+                    select: 'username'
+                }
             });
             res.status(200).send(posts);
         } catch (error) {

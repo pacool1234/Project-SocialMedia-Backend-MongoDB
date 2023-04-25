@@ -4,7 +4,7 @@ const ObjectId = mongoose.SchemaTypes.ObjectId;
 const commentSchema = new mongoose.Schema({
   body: {
     type: String,
-    required: true
+    required: [true, 'Body must have some text']
   },
   image: {
     type: String
@@ -16,7 +16,8 @@ const commentSchema = new mongoose.Schema({
   likes: {
     type: ObjectId,
     ref: 'User'
-  }
+  },
+
 });
 
 const Comment = mongoose.model('Comment', commentSchema);

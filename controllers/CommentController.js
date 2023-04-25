@@ -25,7 +25,7 @@ const CommentController = {
 
   async getAll(req, res) {
     try {
-      const comments = await Comment.find();
+      const comments = await Comment.find().populate('userId', 'username');
       res.send(comments);
     } catch (error) {
       console.error(error);
@@ -33,18 +33,41 @@ const CommentController = {
     }
   },
 
-  async delete(req, res) {
-    try {
-      // not yet
-    } catch (error) {
+  async update(req, res) {
+    try{
+      let data = req.body;
+      if(req.file){
+        data = {...req.body, image: req.file.path}
+        const comment = await Comment.findById(req.params._id);
+        if (comment.image){
+          fs.unlinkSync(comment.image)
+        }
+      }
+      const comment = await Comment.findByIdAndUpdate(
+        req.params._id,
+        data,
+        { new: true }
+      );
+      res.status(200).send({msg:'Comment updated', comment})
+    }catch (error){
       console.error(error);
       res.status(500).send(error);
     }
   },
 
-  async foo_3(req, res) {
+  async delete(req, res) {
+    try {
+      const comment = await Comment.findByIdAndDelete(req.params._id);
+      if (comment.image) {
+        fs.unlinkSync(comment.image);  
+      }
+    res.status(200).send({msg:'Comment deleted', comment} );
 
-  }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
+  },
 
 };
 
