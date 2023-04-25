@@ -1,5 +1,6 @@
 const Post = require('../models/Post');
-const fs = require('fs') //node.js file system module
+const Comment = require('../models/Comment');
+const fs = require('fs'); //node.js file system module
 
 
 const PostController = {
@@ -42,12 +43,12 @@ const PostController = {
             if (post.image) {
                 fs.unlinkSync(post.image);   //Node.js method that deletes the corresponding file
               }
+            await Comment.deleteMany({_id:{$in:post.commentIds}}); //Delete all comments that coincide with the ids in the array
             res.status(200).send({msg:'Post and uploaded files deleted', post} );
         } catch(error){
             console.error(error);
             res.status(500).send(error);
         }
-
     },
     
     async likePost(req, res) {
@@ -92,7 +93,7 @@ const PostController = {
 
     async getAll(req, res) {
         try {
-            const posts = await Post.find().populate('userId', 'username'); 
+            const posts = await Post.find().populate('userId', 'username').populate('commentIds'); 
             /*Add info from an another collection -  must include userId (the "path") and another value. If we want to add more information from another table, we open an object like this: populate({
                 path: 'likes',
                 select: 'username name email role',  etc.
