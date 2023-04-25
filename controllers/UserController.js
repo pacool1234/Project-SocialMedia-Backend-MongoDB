@@ -18,6 +18,7 @@ const UserController = {
       const user = await User.create({
         ...data,
         password: password,
+        role: 'user',
         confirmed: false
        });
       const emailToken = jwt.sign({ email: req.body.email }, jwt_secret, { expiresIn: '48h' });
@@ -127,7 +128,7 @@ const UserController = {
   async getById(req, res) {
     try {
       // Cast first req.body._id to ObjectId
-      const userId = new mongoose.Types.ObjectId(req.body._id);
+      const userId = new mongoose.Types.ObjectId(req.params._id);
       // This way we prevent CastError in the following line
       const user = await User.findById({ _id: userId });
       res.send(user);
