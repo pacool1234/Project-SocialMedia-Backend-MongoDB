@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Post = require('../models/Post');
+const Comment = require('../models/Comment');
 const jwt = require('jsonwebtoken');
 const { jwt_secret } = require('../config/keys.js');
 
@@ -15,7 +16,6 @@ const authentication = async(req, res, next) => {
             console.log(user);
             return res.status(401).send('Unauthorised request');
         }
-
         req.user = user;
         console.log(req.user._id + " authenticated")
         next();
@@ -38,6 +38,22 @@ const isAuthor = async(req, res, next) => {
         return res.status(500).send(error);
     }
 }
+
+const isCommentAuthor = async(req, res, next) => {
+    try{
+        const comment = await Comment.findById(req.params._id);
+        if(comment.userId.toString() !== req.user._id.toString()) {
+            return res.status(403).send({msg: 'Not the author'})
+        }
+        next();
+    }catch(error) {
+        console.error(error);
+        return res.status(500).send(error);
+    }
+}
+
+
+
      
 
-module.exports = { authentication, isAuthor };
+module.exports = { authentication, isAuthor, isCommentAuthor };
