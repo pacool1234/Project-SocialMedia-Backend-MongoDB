@@ -69,6 +69,21 @@ const CommentController = {
     }
   },
 
+  async likeComment(req, res) {
+  try {
+    const comment = await Comment.findByIdAndUpdate(req.params._id);
+    if (comment.likes.includes(req.user._id)) {
+        return res.status(400).send('You\'ve already liked this comment');
+    }
+    comment.likes.push(req.user._id)
+    await comment.save();
+    res.status(201).send({ message: 'You\'ve liked this comment!', comment })
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+},
+
 };
 
 module.exports = CommentController;

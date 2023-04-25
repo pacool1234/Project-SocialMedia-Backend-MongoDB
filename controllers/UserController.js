@@ -142,7 +142,7 @@ const UserController = {
   
   async delete(req, res) {
     try {
-      const userId = new mongoose.Types.ObjectId(req.params._id);
+      const userId = new mongoose.Types.ObjectId(req.user._id);
       const user = await User.findByIdAndDelete({ _id: userId });
       // Delete _id from other users followers array
       await User.updateMany({ followers: userId}, { $pull: { followers: userId }});
