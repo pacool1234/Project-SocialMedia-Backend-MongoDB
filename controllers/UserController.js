@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const User = require('../models/User');
+const Post = require('../models/Post');
+const Comment = require('../models/Comment');
 const { jwt_secret } = require('../config/keys');
 const transporter = require('../config/nodemailer');
 
@@ -138,10 +140,28 @@ const UserController = {
     }
   },
   
-  async deleteById(req, res) {
+  async delete(req, res) {
     try {
       const userId = new mongoose.Types.ObjectId(req.params._id);
       const user = await User.findByIdAndDelete({ _id: userId });
+      // Delete _id from other users followers array
+      await User.updateMany({ followers: userId}, { $pull: { followers: userId }});
+      
+      // Delete _id from other users following array
+      await User.updateMany({ following: userId}, { $pull: { following: userId }});
+
+      // Delete all posts made by the user
+      await Post.deleteMany({ userId: userId });
+
+      // Delete all posts liked by the user
+      await Post.updateMany({ likes: userId }, { $pull: { likes: userId }});
+      
+      // Delete all comments made by the user
+      await Comment.deleteMany({ userId: userId });
+      
+      // Delete all comments liked by the user
+      await Comment.updateMany({ likes: userId }, { $pull: { likes: userId }});
+
       if (user.image) {
         fs.unlinkSync(user.image);
       }

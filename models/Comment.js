@@ -13,10 +13,10 @@ const commentSchema = new mongoose.Schema({
     type: ObjectId,
     ref: 'User'
   },
-  likes: {
+  likes: [{   // Paco: added brackets to make it array. This comment can be deleted once noted.
     type: ObjectId,
     ref: 'User'
-  },
+  }],
 
 });
 
