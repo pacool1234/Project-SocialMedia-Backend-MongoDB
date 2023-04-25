@@ -12,5 +12,8 @@ router.put('/update', uploadUserImg.single('image'), authentication, UserControl
 router.get('/getall', UserController.getAll);
 router.get('/getbyid', UserController.getById);
 router.delete('/delete/:_id', UserController.deleteById);
+router.put('/follow/:targetid', authentication, UserController.follow);
+router.put('/unfollow/:targetid', authentication, UserController.unfollow);
+
 
 module.exports = router;

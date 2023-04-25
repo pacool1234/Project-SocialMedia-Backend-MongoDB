@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const fs = require('fs')
+const fs = require('fs');
 const User = require('../models/User');
 const { jwt_secret } = require('../config/keys');
 const transporter = require('../config/nodemailer');
@@ -80,12 +80,10 @@ const UserController = {
   
   async logout(req, res) {
     try {
-      const tokens = req.user.tokens; // bring tokens array to JS
-      const indexOfToken = tokens.indexOf(req.headers.authorization); // find index of token device is using
-      tokens.splice(indexOfToken, 1); // delete it from array
+      const token = req.headers.authorization;
       await User.updateOne(
         { _id: req.user._id },
-        { $set: { tokens: tokens }}, // substituting old array with new one without the token
+        { $pull: { tokens: token }},
         { new: true }
       );
       res.send({ message: 'You have been logged out' })
@@ -151,7 +149,49 @@ const UserController = {
       console.error(error);
       res.status(500).send(error);
     }
+  },
+  
+  async follow(req, res) {
+    try {
+      const followerId = req.user._id;
+      const followingId = req.params.targetid;
+      // update user that hits follow button
+      const follower = await User.findByIdAndUpdate(
+        followerId,
+        { $push: { following: followingId}}
+      );
+      // update the user that is being followed
+      const following = await User.findByIdAndUpdate(
+        followingId,
+        { $push: { followers: followerId}}
+      );
+      res.send({ message: `User ${follower.username} is now following ${following.username}` });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
+  },
+
+  async unfollow(req, res) {
+    try {
+      const followerId = req.user._id;
+      const followingId = req.params.targetid;
+      // update user that hits UN-follow button
+      const follower = await User.findByIdAndUpdate(
+        followerId,
+        { $pull: { following: followingId}}
+      );
+      // update the user that is being Un-followed
+      const following = await User.findByIdAndUpdate(
+        followingId,
+        { $pull: { followers: followerId}}
+      );
+      res.send({ message: `User ${follower.username} no longer follows ${following.username}` });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
   }
 };
-
+    
 module.exports = UserController;
