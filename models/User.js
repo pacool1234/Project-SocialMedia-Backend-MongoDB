@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
   image: String,
   following: [userId],
   followers: [userId],
-  token: [{
+  tokens: [{
     type: String
   }]
 }, { timestamps: true });

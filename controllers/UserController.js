@@ -5,7 +5,7 @@ const fs = require('fs')
 const User = require('../models/User');
 const { jwt_secret } = require('../config/keys');
 const transporter = require('../config/nodemailer');
-const { JSON } = require('mysql/lib/protocol/constants/types');
+
 
 const UserController = {
   async create(req, res) {
@@ -68,7 +68,7 @@ const UserController = {
 
       await User.updateOne(
         { email: req.body.email },
-        { $push: { token: token }}, //KB: added these to make authentication work again
+        { $push: { tokens: token }}, 
         { new: true }
         );
         res.send({ token, message: `Welcome ${user.username}` });
@@ -85,7 +85,7 @@ const UserController = {
       tokens.splice(indexOfToken, 1); // delete it from array
       await User.updateOne(
         { _id: req.user._id },
-        { $set: { token: tokens }}, // substituting old array with new one without the token
+        { $set: { tokens: tokens }}, // substituting old array with new one without the token
         { new: true }
       );
       res.send({ message: 'You have been logged out' })
