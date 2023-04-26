@@ -179,6 +179,16 @@ const PostController = {
         }
     },
 
+    async getUsersPosts(req, res){
+        try {
+            const posts = await Post.find({userId: req.user._id})
+            res.status(200).send({msg: 'Posts by ' + req.user.username, posts})
+        }catch(error) {
+            console.error(error);
+            res.status(500).send('error');
+        }
+    },
+
     async getAllWithLikesAndComments(req, res) {
         try {
             const posts = await Post.find().populate('userId','username')
