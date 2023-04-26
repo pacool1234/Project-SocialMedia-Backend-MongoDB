@@ -11,6 +11,7 @@ router.put('/logout', authentication, UserController.logout);
 router.put('/update', uploadUserImg.single('image'), authentication, UserController.update);
 router.get('/getall', UserController.getAll);
 router.get('/getbyid/:_id', UserController.getById);
+router.get('/getbyusername/:username', UserController.getByUsername);
 router.delete('/delete', authentication, UserController.delete);
 router.put('/follow/:targetid', authentication, UserController.follow);
 router.put('/unfollow/:targetid', authentication, UserController.unfollow);
