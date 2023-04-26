@@ -140,6 +140,18 @@ const UserController = {
     }
   },
   
+  async getByUsername(req, res) {
+    try {
+      const users = await User.find( 
+        { username: { $regex: '.*' + req.params.username + '.*' }}
+      );
+      res.send(users);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
+  },
+  
   async delete(req, res) {
     try {
       const userId = new mongoose.Types.ObjectId(req.user._id);
@@ -159,8 +171,11 @@ const UserController = {
       // Delete all comments made by the user
       await Comment.deleteMany({ userId: userId });
       
-      // Delete all comments liked by the user
+      // Delete all commentIds present in array Comment.likes ( comments 
+      // that have been likedliked by the user)
       await Comment.updateMany({ likes: userId }, { $pull: { likes: userId }});
+
+      // We still somehow to delete all comments made by the user that are present in Post.commentIds
 
       if (user.image) {
         fs.unlinkSync(user.image);
