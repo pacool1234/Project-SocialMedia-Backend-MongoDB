@@ -11,7 +11,7 @@ const CommentController = {
         data = { ...req.body, userId: req.user._id, image: req.file.path };
       }
       const comment = await Comment.create(data);
-
+ 
       await Post.updateOne(
         { _id: req.params.postid }, // params.postid identifies
         { $push: { commentIds: comment._id } } // newly created comment._id
