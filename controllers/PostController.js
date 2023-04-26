@@ -166,6 +166,16 @@ const PostController = {
         }
     },
 
+    async getFriendsPosts(req, res) {
+        try{
+            const posts = await Post.find({userId: {$in:req.user.following}});
+            res.status(200).send({msg: 'Posts from people you follow', posts})
+        }catch(error){
+            console.error(error);
+            res.status(500).send(error);
+        }
+    },
+
     async getAllWithLikesAndComments(req, res) {
         try {
             const posts = await Post.find().populate('userId','username')
