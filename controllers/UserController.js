@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const fs = require('fs');
+const path = require('path'); // Necessary to provide full path for fs unlink
 const User = require('../models/User');
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
@@ -14,7 +15,7 @@ const UserController = {
     try {
       let data = req.body;
       if (req.file) {
-        data = { ...req.body, image: req.file.path };
+        data = { ...req.body, image: req.file.filename };  //NOT: req.file.path!
       }
       const password = await bcrypt.hash(req.body.password, 10);
       const user = await User.create({
@@ -100,9 +101,10 @@ const UserController = {
     try {
       let data = req.body;
       if (req.file) {
-        data = { ...req.body, image: req.file.path };
+        data = { ...req.body, image: req.file.filename };   //Image must be req.file.filename, not req.file.path
         if (req.user.image) {
-          fs.unlinkSync(req.user.image);
+          const imagePath = path.join(__dirname, '../public/uploads/users/', req.user.image);
+          fs.unlinkSync(imagePath);    //unlink now needs the full path, we can use path module from Node (imported on top)
         }
       }
       const user = await User.findByIdAndUpdate(
@@ -178,7 +180,8 @@ const UserController = {
       // We still somehow to delete all comments made by the user that are present in Post.commentIds
 
       if (user.image) {
-        fs.unlinkSync(user.image);
+        const imagePath = path.join(__dirname, '../public/uploads/users/', user.image);
+        fs.unlinkSync(imagePath);    
       }
       res.send({ message: `User ${user.username} deleted` });
     } catch (error) {

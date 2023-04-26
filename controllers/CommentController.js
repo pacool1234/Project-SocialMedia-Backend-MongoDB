@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
+const path = require('path');
 const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 
@@ -8,7 +9,7 @@ const CommentController = {
     try {
       let data = {...req.body, userId: req.user._id};
       if (req.file) {
-        data = { ...req.body, userId: req.user._id, image: req.file.path };
+        data = { ...req.body, userId: req.user._id, image: req.file.filename };
       }
       const comment = await Comment.create(data);
  
@@ -37,10 +38,11 @@ const CommentController = {
     try{
       let data = req.body;
       if(req.file){
-        data = {...req.body, image: req.file.path}
+        data = {...req.body, image: req.file.filename}
         const comment = await Comment.findById(req.params._id);
         if (comment.image){
-          fs.unlinkSync(comment.image)
+          const imagePath = path.join(__dirname, '../public/uploads/comments/', comment.image);
+          fs.unlinkSync(imagePath);    
         }
       }
       const comment = await Comment.findByIdAndUpdate(
@@ -59,7 +61,8 @@ const CommentController = {
     try {
       const comment = await Comment.findByIdAndDelete(req.params._id);
       if (comment.image) {
-        fs.unlinkSync(comment.image);  
+        const imagePath = path.join(__dirname, '../public/uploads/comments/', comment.image);
+        fs.unlinkSync(imagePath);   
       }
     res.status(200).send({msg:'Comment deleted', comment} );
 

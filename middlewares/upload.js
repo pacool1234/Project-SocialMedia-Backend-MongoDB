@@ -27,7 +27,6 @@ const upload = function (subfolder) {
 
         }
     })
-
 }
 
         
@@ -36,3 +35,4 @@ const uploadPostImg = upload('posts');
 const uploadCommentImg = upload('comments');
 
 module.exports = { uploadUserImg, uploadPostImg, uploadCommentImg }
+

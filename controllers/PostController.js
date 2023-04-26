@@ -1,6 +1,7 @@
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const fs = require('fs'); //node.js file system module
+const path = require('path'); //Necessary to provide full path for fs unlink
 
 
 const PostController = {
@@ -9,7 +10,7 @@ const PostController = {
         try {
             let data = req.body;  
             if(req.file){            //check if file exists, if not, simply take info from body!
-                data = {...req.body, image: req.file.path }
+                data = {...req.body, image: req.file.filename }
             }
             const post = await Post.create({ ...data, userId: req.user._id});
             res.status(201).send({ msg: 'New post created', post });
@@ -23,10 +24,11 @@ const PostController = {
         try {
             let data = req.body;  
             if(req.file){            
-                data = {...req.body, image: req.file.path }
+                data = {...req.body, image: req.file.filename }
                 const post = await Post.findById(req.params._id)  //We delete the old image from uploads if the user provides a new one
                 if (post.image) {
-                    fs.unlinkSync(post.image);   //Node.js method that deletes the corresponding file
+                    const imagePath = path.join(__dirname, '../public/uploads/posts/', post.image);
+                    fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
                   }
             }
             const post = await Post.findByIdAndUpdate(req.params._id, data, {new:true});
@@ -41,7 +43,8 @@ const PostController = {
         try {
             const post = await Post.findByIdAndDelete(req.params._id);
             if (post.image) {
-                fs.unlinkSync(post.image);   //Node.js method that deletes the corresponding file
+                const imagePath = path.join(__dirname, '../public/uploads/posts/', post.image);
+                fs.unlinkSync(imagePath);  
               }
             await Comment.deleteMany({_id:{$in:post.commentIds}}); //Delete all comments that coincide with the ids in the array
             res.status(200).send({msg:'Post and uploaded files deleted', post} );
