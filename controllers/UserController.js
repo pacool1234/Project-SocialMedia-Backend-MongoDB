@@ -6,7 +6,7 @@ const path = require('path'); // Necessary to provide full path for fs unlink
 const User = require('../models/User');
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
-const { jwt_secret } = require('../config/keys');
+require('dotenv').config();
 const transporter = require('../config/nodemailer');
 
 
@@ -24,7 +24,7 @@ const UserController = {
         role: 'user',
         confirmed: false
        });
-      const emailToken = jwt.sign({ email: req.body.email }, jwt_secret, { expiresIn: '48h' });
+      const emailToken = jwt.sign({ email: req.body.email }, process.env.JWT_SECRET, { expiresIn: '48h' });
       const url = `http://localhost:8080/users/confirm/${emailToken}`;
       await transporter.sendMail({
         to: req.body.email,
@@ -43,7 +43,7 @@ const UserController = {
   async confirm(req, res) {
     try {
       const token = req.params.emailToken;
-      const payload = jwt.verify(token, jwt_secret);
+      const payload = jwt.verify(token, process.env.JWT_SECRET);
       await User.updateOne(
         { email: payload.email },
         { confirmed: true }
@@ -68,7 +68,7 @@ const UserController = {
       if (!isMatch) {
         return res.status(400).send({ message: 'Incorrect user/password' });
       }
-      const token = jwt.sign({ _id: user._id }, jwt_secret);
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
       await User.updateOne(
         { email: req.body.email },

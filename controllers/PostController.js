@@ -8,11 +8,12 @@ const PostController = {
 
     async create(req, res) {  //add 'required' to model
         try {
+            console.log("HELLO")
             let data = req.body;  
             if(req.file){            //check if file exists, if not, simply take info from body!
                 data = {...req.body, image: req.file.filename }
             }
-            const post = await Post.create({ ...data, userId: req.user._id});
+            const post = await Post.create({ ...data, userId: req.user._id});  
             res.status(201).send({ msg: 'New post created', post });
         } catch (error) {
             console.error(error);
@@ -187,6 +188,16 @@ const PostController = {
         }catch(error){
             console.error(error);
             res.status(500).send(error);
+        }
+    },
+
+    async getUsersPosts(req, res){
+        try {
+            const posts = await Post.find({userId: req.user._id})
+            res.status(200).send({msg: 'Posts by ' + req.user.username, posts})
+        }catch(error) {
+            console.error(error);
+            res.status(500).send('error');
         }
     },
 

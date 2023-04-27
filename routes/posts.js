@@ -12,6 +12,7 @@ router.get('/getAll', PostController.getAll);
 router.get('/getAndLimit', PostController.getTenPerPage);
 router.get('/getById/:_id', PostController.getById);
 router.get('/getFriendsPosts', authentication, PostController.getFriendsPosts)
+router.get('/getUsersPosts', authentication, PostController.getUsersPosts)
 router.get('/getByTitle/:title', PostController.getByTitle);
 router.put('/likePost/:_id', authentication, PostController.likePost);
 router.put('/unlikePost/:_id', authentication, PostController.unlikePost);
