@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/create', uploadUserImg.single('image'), UserController.create);
 router.get('/confirm/:emailToken', UserController.confirm);
-router.put('/login', UserController.login);
+router.post('/login', UserController.login); // Paco: changed from PUT to POST so html form can be done
 router.put('/logout', authentication, UserController.logout);
 router.put('/update', uploadUserImg.single('image'), authentication, UserController.update);
 router.get('/getall', UserController.getAll);
