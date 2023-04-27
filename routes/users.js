@@ -15,6 +15,8 @@ router.get('/getbyusername/:username', UserController.getByUsername);
 router.delete('/delete', authentication, UserController.delete);
 router.put('/follow/:targetid', authentication, UserController.follow);
 router.put('/unfollow/:targetid', authentication, UserController.unfollow);
+router.get('/recoverPassword/:email', UserController.recoverPassword);
+router.put('/resetPassword/:recoverToken', UserController.resetPassword);
 
 
 module.exports = router;

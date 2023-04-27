@@ -9,6 +9,7 @@ const Comment = require('../models/Comment');
 require('dotenv').config();
 const transporter = require('../config/nodemailer');
 
+const PORT =  process.env.PORT || 3000;
 
 const UserController = {
   async create(req, res, next) {
@@ -26,14 +27,20 @@ const UserController = {
         role: 'user',
         confirmed: false
        });
-      const emailToken = jwt.sign({ email: req.body.email }, process.env.JWT_SECRET, { expiresIn: '48h' });
-      const url = `http://localhost:8080/users/confirm/${emailToken}`;
+       // In order to create several users easily, line above can be changed 
+       // to confirmed:true, and email lines below commented out
+      const emailToken = jwt.sign(
+        { email: req.body.email },
+        process.env.JWT_SECRET,
+        { expiresIn: '48h' }
+      );
+      const url = `http://localhost:${PORT}/users/confirm/${emailToken}`;
       await transporter.sendMail({
         to: req.body.email,
         subject: 'Confirmation email',
         html: `<h3>Welcome, you are one step away from registering</h3>
         <a href='${url}'>Click to confirm your email</a>
-        <p>Confirme su correo en 48 horas</p>`
+        <p>Please, confirm your email within 48h</p>`
       });
       res.status(201).send({ message: 'User created', user });
     } catch (error) {
@@ -183,6 +190,7 @@ const UserController = {
       await Comment.updateMany({ likes: userId }, { $pull: { likes: userId }});
 
       // We still somehow to delete all comments made by the user that are present in Post.commentIds
+      // fetch first all comments a
 
       if (user.image) {
         const imagePath = path.join(__dirname, '../public/uploads/users/', user.image);
@@ -231,6 +239,44 @@ const UserController = {
         { $pull: { followers: followerId}}
       );
       res.send({ message: `User ${follower.username} no longer follows ${following.username}` });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
+  },
+
+  async recoverPassword (req, res) {
+    try {
+      const recoverToken = jwt.sign(
+        { email: req.params.email },
+        process.env.JWT_SECRET,
+        { expiresIn: '48h' }
+      );
+      const url = `http://localhost:${PORT}/users/resetPassword/${recoverToken}`;
+      await transporter.sendMail({
+        to: req.params.email,
+        subject: 'Recover your password',
+        html: `<h3>Recover your password</h3>
+        <a href='${url}'>Click to recover your password</a>
+        <p>This link will expire within 48h</p>`
+      });
+      res.send({ message: 'A recovering email was sent to your email address' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
+  },
+
+  async resetPassword (req, res) {
+    try {
+      const recoverToken = req.params.recoverToken;
+      const payload = jwt.verify(recoverToken, process.env.JWT_SECRET);
+      const password = await bcrypt.hash(req.body.password, 10);
+      await User.findOneAndUpdate(
+        { email: payload.email },
+        { password: password }
+      );
+      res.send({ message: 'Your password has been updated' })
     } catch (error) {
       console.error(error);
       res.status(500).send(error);
