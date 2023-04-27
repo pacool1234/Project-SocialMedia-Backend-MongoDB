@@ -3,6 +3,7 @@ const app = express();
 require("dotenv").config();
 const PORT =  process.env.PORT || 3000;
 const { dbConnection } = require('./config/config')
+const { typeError } = require('./middlewares/errors');
 
 const cors = require('cors');
 
@@ -14,6 +15,8 @@ app.use(express.static('./public')) //Necessary to get correct url in frontend
 app.use('/users', require('./routes/users'));
 app.use('/posts', require('./routes/posts'));
 app.use('/comments', require('./routes/comments'));
+
+app.use(typeError);
 
 dbConnection()
 

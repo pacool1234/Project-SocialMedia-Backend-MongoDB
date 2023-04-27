@@ -11,7 +11,7 @@ const transporter = require('../config/nodemailer');
 
 
 const UserController = {
-  async create(req, res) {
+  async create(req, res, next) {
     try {
       let data = req.body;
       if (req.file) {
@@ -36,7 +36,7 @@ const UserController = {
       res.status(201).send({ message: 'User created', user });
     } catch (error) {
       console.error(error);
-      res.status(500).send({ message: 'There was a problem when creating new user' });
+      next(error);
     }
   },
 
