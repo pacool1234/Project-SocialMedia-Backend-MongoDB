@@ -16,7 +16,9 @@ const UserController = {
       let data = req.body;
       if (req.file) {
         data = { ...req.body, image: req.file.filename };  //NOT: req.file.path!
-      }
+      } else {  //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
+        delete data.image;
+    }
       const password = await bcrypt.hash(req.body.password, 10);
       const user = await User.create({
         ...data,
@@ -106,7 +108,10 @@ const UserController = {
           const imagePath = path.join(__dirname, '../public/uploads/users/', req.user.image);
           fs.unlinkSync(imagePath);    //unlink now needs the full path, we can use path module from Node (imported on top)
         }
-      }
+      } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
+        // if no file was sent, update only the text fields
+        data = { ...req.body };
+    }
       const user = await User.findByIdAndUpdate(
         req.user._id,
         data,

@@ -8,10 +8,12 @@ const PostController = {
 
     async create(req, res) {  //add 'required' to model
         try {
-            console.log("HELLO")
             let data = req.body;  
             if(req.file){            //check if file exists, if not, simply take info from body!
                 data = {...req.body, image: req.file.filename }
+            } else {  //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
+                // if there is no file, remove the "image" property from the data object
+                delete data.image;
             }
             const post = await Post.create({ ...data, userId: req.user._id});  
             res.status(201).send({ msg: 'New post created', post });
@@ -23,16 +25,19 @@ const PostController = {
 
     async update(req, res) {
         try {
-            let data = req.body;  
-            if(req.file){            
-                data = {...req.body, image: req.file.filename }
+            let data = req.body;
+            if (req.file) {
+                data = { ...req.body, image: req.file.filename }
                 const post = await Post.findById(req.params._id)  //We delete the old image from uploads if the user provides a new one
                 if (post.image) {
                     const imagePath = path.join(__dirname, '../public/uploads/posts/', post.image);
                     fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
-                  }
+                }
+            } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
+                // if no file was sent, update only the text fields
+                data = { ...req.body };
             }
-            const post = await Post.findByIdAndUpdate(req.params._id, data, {new:true});
+            const post = await Post.findByIdAndUpdate(req.params._id, data, { new: true });
             res.status(200).send({ msg: 'Post updated', post });
         } catch (error) {
             console.error(error);
@@ -193,7 +198,10 @@ const PostController = {
 
     async getUsersPosts(req, res){
         try {
-            const posts = await Post.find({userId: req.user._id})
+            const posts = await Post.find({userId: req.user._id}).populate({
+                path: 'likes',
+                select: 'username'
+            })
             res.status(200).send({msg: 'Posts by ' + req.user.username, posts})
         }catch(error) {
             console.error(error);
