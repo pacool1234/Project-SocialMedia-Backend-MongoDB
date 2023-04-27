@@ -8,15 +8,27 @@ const handleValidationError = (err, res) => {
   }
 };
 
+const handleDuplicateError = (err, res) => {
+  const duplicateKey = Object.getOwnPropertyNames(err.keyPattern)[0];
+  const duplicateValue = err.keyValue[duplicateKey];
+  const msgErr = `${duplicateKey} ${duplicateValue} is already in use`
+  res.status(400).send({ messages: msgErr })
+
+};
+
 const typeError = (err, req, res, next) => {
   if (
     err.name === "SequelizeValidationError" ||
     err.name === "SequelizeUniqueConstraintError"
   ) {
     handleValidationError(err, res);
-  } else {
-    res.status(500).send({ msg: "There was a problem", err });
   }
+  
+  if (err.code === 11000) {
+    handleDuplicateError(err, res);
+  }
+  
+  res.status(500).send({ msg: "There was a problem", err });
 };
 
 module.exports = { typeError };
