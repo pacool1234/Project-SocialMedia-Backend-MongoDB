@@ -182,7 +182,10 @@ const PostController = {
 
     async getUsersPosts(req, res){
         try {
-            const posts = await Post.find({userId: req.user._id})
+            const posts = await Post.find({userId: req.user._id}).populate({
+                path: 'likes',
+                select: 'username'
+            })
             res.status(200).send({msg: 'Posts by ' + req.user.username, posts})
         }catch(error) {
             console.error(error);
