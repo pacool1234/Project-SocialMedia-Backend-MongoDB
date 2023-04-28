@@ -196,7 +196,7 @@ const UserController = {
       if (user.image) {
         const imagePath = path.join(__dirname, '../public/uploads/users/', user.image);
         if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
+          fs.unlinkSync(imagePath);   
         }
       }
       res.send({ message: `User ${user.username} deleted` });
