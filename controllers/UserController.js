@@ -110,7 +110,7 @@ const UserController = {
         }
       } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
         // if no file was sent, update only the text fields
-        data = { ...req.body };
+        delete data.image;
     }
       const user = await User.findByIdAndUpdate(
         req.user._id,

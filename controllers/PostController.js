@@ -12,7 +12,6 @@ const PostController = {
             if(req.file){            //check if file exists, if not, simply take info from body!
                 data = {...req.body, image: req.file.filename }
             } else {  //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
-                // if there is no file, remove the "image" property from the data object
                 delete data.image;
             }
             const post = await Post.create({ ...data, userId: req.user._id});  
@@ -28,6 +27,7 @@ const PostController = {
             let data = req.body;
             if (req.file) {
                 data = { ...req.body, image: req.file.filename }
+                console.log("there is file")
                 const post = await Post.findById(req.params._id)  //We delete the old image from uploads if the user provides a new one
                 if (post.image) {
                     const imagePath = path.join(__dirname, '../public/uploads/posts/', post.image);
@@ -35,7 +35,7 @@ const PostController = {
                 }
             } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
                 // if no file was sent, update only the text fields
-                data = { ...req.body };
+                delete data.image;
             }
             const post = await Post.findByIdAndUpdate(req.params._id, data, { new: true });
             res.status(200).send({ msg: 'Post updated', post });

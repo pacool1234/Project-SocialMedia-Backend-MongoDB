@@ -48,7 +48,7 @@ const CommentController = {
         }
       } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
         // if no file was sent, update only the text fields
-        data = { ...req.body };
+        delete data.image;
     }
       const comment = await Comment.findByIdAndUpdate(
         req.params._id,
