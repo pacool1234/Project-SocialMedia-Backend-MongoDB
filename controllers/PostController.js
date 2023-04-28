@@ -31,10 +31,11 @@ const PostController = {
                 const post = await Post.findById(req.params._id)  //We delete the old image from uploads if the user provides a new one
                 if (post.image) {
                     const imagePath = path.join(__dirname, '../public/uploads/posts/', post.image);
-                    fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
+                    if(fs.existsSync(imagePath)) {
+                        fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
+                      }   
                 }
-            } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
-                // if no file was sent, update only the text fields
+            } else {    // if no file was sent, update only the text fields
                 delete data.image;
             }
             const post = await Post.findByIdAndUpdate(req.params._id, data, { new: true });
@@ -50,7 +51,9 @@ const PostController = {
             const post = await Post.findByIdAndDelete(req.params._id);
             if (post.image) {
                 const imagePath = path.join(__dirname, '../public/uploads/posts/', post.image);
-                fs.unlinkSync(imagePath);  
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);   
+                  }
               }
             await Comment.deleteMany({_id:{$in:post.commentIds}}); //Delete all comments that coincide with the ids in the array
             res.status(200).send({msg:'Post and uploaded files deleted', post} );

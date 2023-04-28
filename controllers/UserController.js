@@ -113,12 +113,13 @@ const UserController = {
         data = { ...req.body, image: req.file.filename };   //Image must be req.file.filename, not req.file.path
         if (req.user.image) {
           const imagePath = path.join(__dirname, '../public/uploads/users/', req.user.image);
-          fs.unlinkSync(imagePath);    //unlink now needs the full path, we can use path module from Node (imported on top)
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
+          }
         }
-      } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
-        // if no file was sent, update only the text fields
+      } else {
         delete data.image;
-    }
+      }
       const user = await User.findByIdAndUpdate(
         req.user._id,
         data,
@@ -194,7 +195,9 @@ const UserController = {
 
       if (user.image) {
         const imagePath = path.join(__dirname, '../public/uploads/users/', user.image);
-        fs.unlinkSync(imagePath);    
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
+        }
       }
       res.send({ message: `User ${user.username} deleted` });
     } catch (error) {
