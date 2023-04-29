@@ -147,7 +147,15 @@ const UserController = {
       // Cast first req.body._id to ObjectId
       const userId = new mongoose.Types.ObjectId(req.params._id);
       // This way we prevent CastError in the following line
-      const user = await User.findById({ _id: userId });
+      const user = await User.findById({ _id: userId })
+      .populate({
+        path: 'following',
+        select: 'username image'
+      })
+      .populate({
+        path: 'followers',
+        select: 'username image'
+      });
       res.send(user);
     } catch (error) {
       console.error(error);
