@@ -57,6 +57,15 @@ userSchema.index({
   username: 'text'
 });
 
+
+userSchema.methods.toJSON = function() {
+  const user = this._doc;
+  delete user.tokens;
+  delete user.password;
+  return user;
+}
+
+
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
