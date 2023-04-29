@@ -132,7 +132,11 @@ const UserController = {
         }
       } else {
         delete data.image;
-      }
+      };
+
+      // PACO: make sure that user cannot update email
+      delete data.email;
+
       const user = await User.findByIdAndUpdate(
         req.user._id,
         data,
@@ -178,7 +182,7 @@ const UserController = {
   
   async getByUsername(req, res) {
     try {
-      const users = await User.find( 
+      const users = await User.find(
         { username: { $regex: '.*' + req.params.username + '.*' }}
       );
       res.send(users);
