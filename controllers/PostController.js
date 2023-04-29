@@ -206,6 +206,13 @@ const PostController = {
                 path: 'likes',
                 select: 'username'
             })
+            .populate({
+                path: 'commentIds',
+                populate: {
+                    path: 'userId',
+                    select: 'username'
+                }
+            })
             .sort('field -createdAt')  //Sort newest first!
             res.status(200).send({msg: 'Posts by ' + req.user.username, posts})
         }catch(error) {
