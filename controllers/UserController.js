@@ -108,9 +108,22 @@ const UserController = {
 
   async update(req, res) {
     try {
-      let data = req.body;
+      let data = { ...req.body };
+
+      if (req.body.username) {
+        let usernameAlreadyTaken = await User.exists({ username: req.body.username });
+        if (usernameAlreadyTaken) {
+          return res.status(400).send({ message: `username ${req.body.username} already in use` });
+        }
+      };
+
+      if (req.body.password) {
+        const newPassword = await bcrypt.hash(req.body.password, 10);
+        data.password = newPassword;
+      };
+      
       if (req.file) {
-        data = { ...req.body, image: req.file.filename };   //Image must be req.file.filename, not req.file.path
+        data = { ...data, image: req.file.filename };   //Image must be req.file.filename, not req.file.path
         if (req.user.image) {
           const imagePath = path.join(__dirname, '../public/uploads/users/', req.user.image);
           if (fs.existsSync(imagePath)) {
@@ -119,13 +132,17 @@ const UserController = {
         }
       } else {
         delete data.image;
-      }
+      };
+
+      // PACO: make sure that user cannot update email
+      delete data.email;
+
       const user = await User.findByIdAndUpdate(
         req.user._id,
         data,
         { new: true }
       );
-      res.send({ message: `User ${user.username} updated`, x: req.file });
+      res.send({ message: `User ${user.username} updated`, x: req.file, pw: data.password });
     } catch (error) {
       console.error(error);
       res.status(500).send(error);
@@ -165,7 +182,7 @@ const UserController = {
   
   async getByUsername(req, res) {
     try {
-      const users = await User.find( 
+      const users = await User.find(
         { username: { $regex: '.*' + req.params.username + '.*' }}
       );
       res.send(users);
