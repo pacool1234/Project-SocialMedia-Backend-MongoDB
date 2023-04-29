@@ -12,7 +12,6 @@ const PostController = {
             if(req.file){            //check if file exists, if not, simply take info from body!
                 data = {...req.body, image: req.file.filename }
             } else {  //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
-                // if there is no file, remove the "image" property from the data object
                 delete data.image;
             }
             const post = await Post.create({ ...data, userId: req.user._id});  
@@ -28,14 +27,16 @@ const PostController = {
             let data = req.body;
             if (req.file) {
                 data = { ...req.body, image: req.file.filename }
+                console.log("there is file")
                 const post = await Post.findById(req.params._id)  //We delete the old image from uploads if the user provides a new one
                 if (post.image) {
                     const imagePath = path.join(__dirname, '../public/uploads/posts/', post.image);
-                    fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
+                    if(fs.existsSync(imagePath)) {
+                        fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
+                      }   
                 }
-            } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
-                // if no file was sent, update only the text fields
-                data = { ...req.body };
+            } else {    // if no file was sent, update only the text fields
+                delete data.image;
             }
             const post = await Post.findByIdAndUpdate(req.params._id, data, { new: true });
             res.status(200).send({ msg: 'Post updated', post });
@@ -50,7 +51,9 @@ const PostController = {
             const post = await Post.findByIdAndDelete(req.params._id);
             if (post.image) {
                 const imagePath = path.join(__dirname, '../public/uploads/posts/', post.image);
-                fs.unlinkSync(imagePath);  
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);   
+                  }
               }
             await Comment.deleteMany({_id:{$in:post.commentIds}}); //Delete all comments that coincide with the ids in the array
             res.status(200).send({msg:'Post and uploaded files deleted', post} );
@@ -198,10 +201,12 @@ const PostController = {
 
     async getUsersPosts(req, res){
         try {
-            const posts = await Post.find({userId: req.user._id}).populate({
+            const posts = await Post.find({userId: req.user._id})
+            .populate({
                 path: 'likes',
                 select: 'username'
             })
+            .sort('field -createdAt')  //Sort newest first!
             res.status(200).send({msg: 'Posts by ' + req.user.username, posts})
         }catch(error) {
             console.error(error);

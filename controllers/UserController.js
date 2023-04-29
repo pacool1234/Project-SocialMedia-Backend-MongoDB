@@ -126,16 +126,13 @@ const UserController = {
         data = { ...data, image: req.file.filename };   //Image must be req.file.filename, not req.file.path
         if (req.user.image) {
           const imagePath = path.join(__dirname, '../public/uploads/users/', req.user.image);
-          fs.unlinkSync(imagePath);    //unlink now needs the full path, we can use path module from Node (imported on top)
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
+          }
         }
-      } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
-        // if no file was sent, update only the text fields
-        data = { ...data };
-      };
-      
-      // PACO: make sure that user cannot update email
-      delete data.email;
-
+      } else {
+        delete data.image;
+      }
       const user = await User.findByIdAndUpdate(
         req.user._id,
         data,
@@ -163,7 +160,15 @@ const UserController = {
       // Cast first req.body._id to ObjectId
       const userId = new mongoose.Types.ObjectId(req.params._id);
       // This way we prevent CastError in the following line
-      const user = await User.findById({ _id: userId });
+      const user = await User.findById({ _id: userId })
+      .populate({
+        path: 'following',
+        select: 'username image'
+      })
+      .populate({
+        path: 'followers',
+        select: 'username image'
+      });
       res.send(user);
     } catch (error) {
       console.error(error);
@@ -211,7 +216,9 @@ const UserController = {
 
       if (user.image) {
         const imagePath = path.join(__dirname, '../public/uploads/users/', user.image);
-        fs.unlinkSync(imagePath);    
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);   
+        }
       }
       res.send({ message: `User ${user.username} deleted` });
     } catch (error) {

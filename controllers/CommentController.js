@@ -44,11 +44,13 @@ const CommentController = {
         const comment = await Comment.findById(req.params._id);
         if (comment.image){
           const imagePath = path.join(__dirname, '../public/uploads/comments/', comment.image);
-          fs.unlinkSync(imagePath);    
+          if(fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
+          }    
         }
       } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
         // if no file was sent, update only the text fields
-        data = { ...req.body };
+        delete data.image;
     }
       const comment = await Comment.findByIdAndUpdate(
         req.params._id,
@@ -67,7 +69,9 @@ const CommentController = {
       const comment = await Comment.findByIdAndDelete(req.params._id);
       if (comment.image) {
         const imagePath = path.join(__dirname, '../public/uploads/comments/', comment.image);
-        fs.unlinkSync(imagePath);   
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);   
+        }   
       }
     res.status(200).send({msg:'Comment deleted', comment} );
 
