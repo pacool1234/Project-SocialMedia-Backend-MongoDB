@@ -25,23 +25,23 @@ const UserController = {
         ...data,
         password: password,
         role: 'user',
-        confirmed: false
+        confirmed: true
        });
        // In order to create several users easily, line above can be changed 
        // to confirmed:true, and email lines below commented out
-      const emailToken = jwt.sign(
-        { email: req.body.email },
-        process.env.JWT_SECRET,
-        { expiresIn: '48h' }
-      );
-      const url = `http://localhost:${PORT}/users/confirm/${emailToken}`;
-      await transporter.sendMail({
-        to: req.body.email,
-        subject: 'Confirmation email',
-        html: `<h3>Welcome, you are one step away from registering</h3>
-        <a href='${url}'>Click to confirm your email</a>
-        <p>Please, confirm your email within 48h</p>`
-      });
+      // const emailToken = jwt.sign(
+      //   { email: req.body.email },
+      //   process.env.JWT_SECRET,
+      //   { expiresIn: '48h' }
+      // );
+      // const url = `http://localhost:${PORT}/users/confirm/${emailToken}`;
+      // await transporter.sendMail({
+      //   to: req.body.email,
+      //   subject: 'Confirmation email',
+      //   html: `<h3>Welcome, you are one step away from registering</h3>
+      //   <a href='${url}'>Click to confirm your email</a>
+      //   <p>Please, confirm your email within 48h</p>`
+      // });
       res.status(201).send({ message: 'User created', user });
     } catch (error) {
       console.error(error);
@@ -206,18 +206,24 @@ const UserController = {
       // Delete all posts made by the user
       await Post.deleteMany({ userId: userId });
 
-      // Delete all posts liked by the user
+      // Delete all likes from posts liked by the user
       await Post.updateMany({ likes: userId }, { $pull: { likes: userId }});
-      
-      // Delete all comments made by the user
-      await Comment.deleteMany({ userId: userId });
       
       // Delete all commentIds present in array Comment.likes ( comments 
       // that have been likedliked by the user)
       await Comment.updateMany({ likes: userId }, { $pull: { likes: userId }});
 
-      // We still somehow to delete all comments made by the user that are present in Post.commentIds
-      // fetch first all comments a
+      // Delete all comments made by the user that are present in Post.commentIds
+      const userComments = await Comment.find({ userId: userId });
+      const commentIdsToDelete = userComments.map((comment) => comment._id);
+      
+      // Only now we can delete all comments made by the user
+      await Comment.deleteMany({ userId: userId });
+      
+      await Post.updateMany(
+        { commentIds: { $in: commentIdsToDelete } },
+        { $pull: { commentIds: { $in: commentIdsToDelete } } }
+      );
 
       if (user.image) {
         const imagePath = path.join(__dirname, '../public/uploads/users/', user.image);
