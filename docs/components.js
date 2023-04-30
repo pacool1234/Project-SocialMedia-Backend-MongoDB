@@ -1,5 +1,12 @@
 module.exports = {
     components: {
+        securitySchemes: {
+            ApiKeyAuth: {
+              type: "apiKey",
+              name: "Authorization",
+              in: "header"
+            }
+        },      
         schemas: {  //Schemas can be models but also e.g. recycling ID
             post: {
                 type: 'object',
@@ -46,6 +53,10 @@ module.exports = {
             PostInput: {   //Whatever must be posted through req.body or form data
                 type: 'object',
                 properties: {
+                    // userID: {
+                    //     type: 'objectId'
+                    //     description: ''
+                    // }
                     title: {
                         type: 'string',
                         description: "The title of the post",
@@ -63,7 +74,13 @@ module.exports = {
                     }
 
                 }
-            }
+            },
+            _id:{
+                type:'objectId',
+                description:"Unique id of the post",
+                example: "6444f9a6c138bf091c8ae17b"
+            },
+
         }
 
     }

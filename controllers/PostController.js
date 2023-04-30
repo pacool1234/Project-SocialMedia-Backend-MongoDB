@@ -11,7 +11,7 @@ const PostController = {
             let data = req.body;  
             if(req.file){            //check if file exists, if not, simply take info from body!
                 data = {...req.body, image: req.file.filename }
-            } else {  //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
+            } else {  
                 delete data.image;
             }
             const post = await Post.create({ ...data, userId: req.user._id});  
