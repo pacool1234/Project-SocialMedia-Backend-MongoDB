@@ -78,16 +78,18 @@ const UserController = {
         return res.status(400).send({ message: 'Incorrect user/password' });
       }
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-      await User.updateOne(
-        { email: req.body.email },
-        { $push: { tokens: token }}, 
-        { new: true }
-        );
-        res.send({ token, _id: `${user._id}`, message: `Welcome ${user.username}`}); //PACO: I added userId as I need it for frontend!
-      } catch (error) {
-        console.error(error);
-        res.status(500).send(error);
+
+      if (user.tokens.length >= 4) {
+        user.tokens = user.tokens.splice(user.tokens.length - 3);
       }
+
+      user.tokens.push(token);
+      await user.save();
+      res.send({ token, _id: `${user._id}`, message: `Welcome ${user.username}`}); //PACO: I added userId as I need it for frontend!
+    } catch (error) {
+      console.error(error);
+      res.status(500).send(error);
+    }
   },
   
   async logout(req, res) {

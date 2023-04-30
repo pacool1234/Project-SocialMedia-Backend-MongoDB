@@ -60,7 +60,7 @@ userSchema.index({
 
 userSchema.methods.toJSON = function() {
   const user = this._doc;
-  delete user.tokens;
+  // delete user.tokens; PACO: we need to actually return tokens array in order to add max-4-tokens feature
   delete user.password;
   return user;
 }
