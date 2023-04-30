@@ -14,9 +14,9 @@ router.get('/getById/:_id', PostController.getById);
 router.get('/getFriendsPosts', authentication, PostController.getFriendsPosts)
 router.get('/getUsersPosts', authentication, PostController.getUsersPosts)
 router.get('/getByTitle/:title', PostController.getByTitle);
+router.get('/getAllWithLikesAndComments', PostController.getAllWithLikesAndComments);
 router.put('/likePost/:_id', authentication, PostController.likePost);
 router.put('/unlikePost/:_id', authentication, PostController.unlikePost);
-router.get('/getAllWithLikesAndComments', PostController.getAllWithLikesAndComments);
 
 module.exports = router;
 
