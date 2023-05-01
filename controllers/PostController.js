@@ -4,7 +4,7 @@ const Post = require("../models/Post");
 const Comment = require("../models/Comment");
 
 const PostController = {
-  async create(req, res) {
+  async create(req, res, next) {
     try {
       let data = req.body;
       if (req.file) {
@@ -16,7 +16,7 @@ const PostController = {
       res.status(201).send({ msg: "New post created", post });
     } catch (error) {
       console.error(error);
-      res.status(500).send(error);
+      next(error)
     }
   },
 
