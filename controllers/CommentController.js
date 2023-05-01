@@ -7,12 +7,12 @@ const Post = require('../models/Post');
 const CommentController = {
   async create(req, res) {
     try {
-      let data = {...req.body, userId: req.user._id};
+      let data = { ...req.body, userId: req.user._id };
       if (req.file) {
         data = { ...req.body, userId: req.user._id, image: req.file.filename };
       } else {  //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
         delete data.image;
-    }
+      }
       const comment = await Comment.create(data);
  
       await Post.updateOne(
@@ -48,9 +48,8 @@ const CommentController = {
             fs.unlinkSync(imagePath);   //Node.js method that deletes the corresponding file
           }    
         }
-      } else { //PACO: ADDED THIS ELSE, or image will be saved as "undefined"
-        // if no file was sent, update only the text fields
-        delete data.image;
+      } else {
+        delete data.image; // This prevents image to be be saved as "undefined"
     }
       const comment = await Comment.findByIdAndUpdate(
         req.params._id,
