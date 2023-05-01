@@ -201,7 +201,7 @@ const PostController = {
 
     async getUsersPosts(req, res){
         try {
-            const posts = await Post.find({userId: req.user._id})
+            const posts = await Post.find({userId: req.params.userId})
             .populate({
                 path: 'likes',
                 select: 'username'
@@ -214,7 +214,7 @@ const PostController = {
                 }
             })
             .sort('field -createdAt')  //Sort newest first!
-            res.status(200).send({msg: 'Posts by ' + req.user.username, posts})
+            res.status(200).send({msg: 'Posts by user ' + posts[0].userId, posts})
         }catch(error) {
             console.error(error);
             res.status(500).send('error');
