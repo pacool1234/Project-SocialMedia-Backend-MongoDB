@@ -37,7 +37,7 @@ module.exports = {
                         example: '["64463b390c94b93e17bea623", "644a60c9b0528ff6aedef37a"]'
                     },
                     userId: {
-                        type: 'object',
+                        type: 'objectId',
                         description: 'Stores the unique id of the post\'s author and a reference to user collection',
                         example: '6448f89564e3345d4c84a314'
                     },
@@ -53,10 +53,6 @@ module.exports = {
             PostInput: {   //Whatever must be posted through req.body or form data
                 type: 'object',
                 properties: {
-                    // userID: {
-                    //     type: 'objectId'
-                    //     description: ''
-                    // }
                     title: {
                         type: 'string',
                         description: "The title of the post",

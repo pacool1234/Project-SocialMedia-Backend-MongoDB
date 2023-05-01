@@ -129,7 +129,7 @@ module.exports = {
                         name: 'title',
                         in: 'query',
                         schema: {
-                            $ref: '#/components/schemas/PostInput/properties/title',
+                            $ref: '#/components/schemas/post/properties/title',
                             type: 'string'
                         },
                         description: 'Title or partial title of the post',
@@ -151,25 +151,25 @@ module.exports = {
             },
         },
 
-        '/posts/getUsersPosts': { 
+        '/posts/getUsersPosts/{userId}': { 
             get: {
                 security: [{
                     ApiKeyAuth: []
                   }],    
                 tags: {
-                    Posts: 'Posts by User',
+                    Posts: 'Posts by Specific User. Authentication required',
                 },
-                description: 'Gets the posts of the user currently logged in. Requires authentication',
-                operationId: 'PostsByUser',   
+                description: 'Gets the posts of a specific user.',
+                operationId: 'PostsBySpecificUser',   
                 parameters: [
                         {
-                            name: '_id',
+                            name: 'userId',
                             in: 'path',
                             schema: {
-                                $ref: '#/components/schemas/_id',
+                                $ref: '#/components/schemas/post/properties/userId',
                                 type: 'string'
                             },
-                            description: 'Id of the post',
+                            description: 'Id the a user',
                         },
                 ],
                 responses: {
