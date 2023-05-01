@@ -1,25 +1,26 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const ObjectId = mongoose.SchemaTypes.ObjectId;
 
 const commentSchema = new mongoose.Schema({
   body: {
     type: String,
-    required: [true, 'Body must have some text']
+    required: [true, "Body must have some text"],
   },
   image: {
-    type: String
+    type: String,
   },
   userId: {
     type: ObjectId,
-    ref: 'User'
+    ref: "User",
   },
-  likes: [{   // Paco: added brackets to make it array. This comment can be deleted once noted.
-    type: ObjectId,
-    ref: 'User'
-  }],
-
+  likes: [
+    {
+      type: ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
-const Comment = mongoose.model('Comment', commentSchema);
+const Comment = mongoose.model("Comment", commentSchema);
 
 module.exports = Comment;
