@@ -186,6 +186,30 @@ module.exports = {
                 },
             },
         },
+        '/posts/FriendsPosts': { 
+            get: {
+                security: [{
+                    ApiKeyAuth: []
+                  }],    
+                tags: {
+                    Posts: 'Friends posts',
+                },
+                description: 'Gets the posts of the people the user is following. User must be logged in',
+                operationId: 'friendsPosts',   
+                responses: {
+                    200: {
+                        description: 'Posts from people the user follows',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    $ref: '#/components/schemas/post',
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         '/posts/create': {
             post: {
                 tags: {
@@ -228,8 +252,8 @@ module.exports = {
                     Posts: 'Update by Id',
                 },
 
-                description: 'Update post by Id - only if author of the post.',
-                operationId: 'updateById',   //Copy of “Tasks” but together
+                description: 'Update post by Id - Note that a middleware is used to check if the user\'s id matches the post\'s creator\'s id (isAuthor).',
+                operationId: 'updateById',   
                 parameters:  [
                     {
                         name: '_id',
@@ -248,12 +272,128 @@ module.exports = {
                             schema: {
                                 $ref: '#/components/schemas/PostInput',
                             },
-                        }
+                        },
                     }
                 },
                 responses: {
                     200: {
                         description: 'Post updated',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    $ref: '#/components/schemas/post',
+                                },
+                            },
+                        },
+                    },
+                },
+
+            }
+        },
+        '/posts/likePost/{_id}': {
+            put: {
+                security: [{
+                ApiKeyAuth: []
+              }],      
+                tags: {
+                    Posts: 'Like a Post',
+                },
+
+                description: 'Like a post. Authentication required.',
+                operationId: 'likeAPost',   
+                parameters:  [
+                    {
+                        name: '_id',
+                        in: 'path',
+                        schema: {
+                            $ref: '#/components/schemas/_id',
+                            type: 'string'
+                        },
+                        description: 'Id of the post',
+                    },
+
+                ],
+                responses: {
+                    200: {
+                        description: 'You have liked this post',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    $ref: '#/components/schemas/post',
+                                },
+                            },
+                        },
+                    },
+                },
+            }
+        },
+        '/posts/unlikePost/{_id}': {
+            put: {
+                security: [{
+                ApiKeyAuth: []
+              }],      
+                tags: {
+                    Posts: 'Unike a Post',
+                },
+
+                description: 'Removes your like from a post. Authentication required.',
+                operationId: 'unlikeAPost',   
+                parameters:  [
+                    {
+                        name: '_id',
+                        in: 'path',
+                        schema: {
+                            $ref: '#/components/schemas/_id',
+                            type: 'string'
+                        },
+                        description: 'Id of the post',
+                    },
+
+                ],
+                responses: {
+                    200: {
+                        description: 'You\'ve unliked the post.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    $ref: '#/components/schemas/post',
+                                },
+                            },
+                        },
+                    },
+                  400: {
+                    description: 'Cannot unlike a post you haven\'t liked'
+                  }  
+                },
+            }
+        },
+
+        '/posts/delete/{_id}': {
+            put: {
+                security: [{
+                ApiKeyAuth: []
+              }],      
+                tags: {
+                    Posts: 'Delete by Id',
+                },
+
+                description: 'Delete post by Id - Note that a middleware is used to check if the user\'s id matches the post\'s creator\'s id (isAuthor).',
+                operationId: 'deleteById',  
+                parameters:  [
+                    {
+                        name: '_id',
+                        in: 'path',
+                        schema: {
+                            $ref: '#/components/schemas/_id',
+                            type: 'string'
+                        },
+                        description: 'Id of the post',
+                    },
+
+                ],
+                responses: {
+                    200: {
+                        description: 'Post deleted',
                         content: {
                             'application/json': {
                                 schema: {
